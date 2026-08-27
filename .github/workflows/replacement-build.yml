@@ -1,0 +1,53 @@
+name: En Croissant Replacement Build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-macos-apple-silicon:
+    name: macOS Apple Silicon
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin
+
+      - name: Cache Rust build
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: ./src-tauri -> target
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: pnpm
+
+      - name: Install app dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build replacement app
+        run: pnpm tauri build --target aarch64-apple-darwin --bundles dmg
+        env:
+          CI: false
+
+      - name: Upload En Croissant installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: En-Croissant-macOS-Apple-Silicon
+          path: src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
+          if-no-files-found: error
+          retention-days: 7
