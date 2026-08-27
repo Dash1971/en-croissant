@@ -1,5 +1,16 @@
 {
+  "productName": "En Croissant Test",
+  "identifier": "org.encroissant.app.test",
   "bundle": {
     "createUpdaterArtifacts": false
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "En Croissant Test",
+        "visible": false,
+        "decorations": true
+      }
+    ]
   }
 }
