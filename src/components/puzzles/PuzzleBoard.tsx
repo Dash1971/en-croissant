@@ -22,12 +22,16 @@ function PuzzleBoard({
   changeCompletion,
   generatePuzzle,
   db,
+  reviewMode,
+  enterReviewMode,
 }: {
   puzzles: Puzzle[];
   currentPuzzle: number;
   changeCompletion: (completion: Completion) => Promise<void>;
   generatePuzzle: (db: string) => Promise<void>;
   db: string | null;
+  reviewMode: boolean;
+  enterReviewMode: () => void;
 }) {
   const store = useContext(TreeStateContext)!;
   const root = useStore(store, (s) => s.root);
@@ -86,12 +90,6 @@ function PuzzleBoard({
           await changeCompletion("correct");
         }
         setEnded(false);
-
-        if (db && jumpToNextPuzzleImmediately) {
-          await generatePuzzle(db);
-          reset();
-          return;
-        }
       }
       const newMoves = puzzle.moves.slice(currentMove, currentMove + 2);
       makeMoves({
@@ -99,6 +97,13 @@ function PuzzleBoard({
         mainline: true,
         changeHeaders: false,
       });
+      if (currentMove === puzzle.moves.length - 1) {
+        if (db && jumpToNextPuzzleImmediately) {
+          await generatePuzzle(db);
+        } else {
+          enterReviewMode();
+        }
+      }
     } else {
       makeMove({
         payload: move,
@@ -111,6 +116,18 @@ function PuzzleBoard({
       setEnded(true);
     }
     reset();
+  }
+
+  function playMove(move: Move) {
+    if (reviewMode) {
+      makeMove({
+        payload: move,
+        changeHeaders: false,
+      });
+      reset();
+      return;
+    }
+    void checkMove(move);
   }
 
   const { ref: parentRef, height: parentHeight } = useElementSize();
@@ -128,7 +145,7 @@ function PuzzleBoard({
           cancelMove={() => setPendingMove(null)}
           confirmMove={async (p) => {
             if (pendingMove) {
-              await checkMove({ ...pendingMove, promotion: p });
+              playMove({ ...pendingMove, promotion: p });
               setPendingMove(null);
             }
           }}
@@ -150,9 +167,10 @@ function PuzzleBoard({
           movable={{
             free: false,
             color:
-              puzzle &&
-              equal(position, Array(currentMove).fill(0)) &&
-              (puzzle.completion === "incomplete" || puzzle.completion === "incorrect")
+              reviewMode ||
+              (puzzle &&
+                equal(position, Array(currentMove).fill(0)) &&
+                (puzzle.completion === "incomplete" || puzzle.completion === "incorrect"))
                 ? turn
                 : undefined,
             dests: dests,
@@ -167,7 +185,7 @@ function PuzzleBoard({
                 ) {
                   setPendingMove(move);
                 } else {
-                  checkMove(move);
+                  playMove(move);
                 }
               },
             },
