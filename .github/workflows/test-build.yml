@@ -2,6 +2,9 @@ name: Test Build
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - feature/puzzle-in-place-analysis
 
 permissions:
   contents: read
