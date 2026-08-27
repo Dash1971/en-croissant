@@ -7,13 +7,23 @@ import equal from "fast-deep-equal";
 import { useAtom, useAtomValue } from "jotai";
 import { useContext, useState } from "react";
 import { useStore } from "zustand";
+import { useShallow } from "zustand/react/shallow";
 import { Chessground } from "@/chessground/Chessground";
-import { jumpToNextPuzzleAtom, moveHighlightAtom, showCoordinatesAtom } from "@/state/atoms";
+import {
+  bestMovesFamily,
+  jumpToNextPuzzleAtom,
+  moveHighlightAtom,
+  showArrowsAtom,
+  showConsecutiveArrowsAtom,
+  showCoordinatesAtom,
+} from "@/state/atoms";
 import classes from "@/styles/Chessboard.module.css";
+import { getVariationLine } from "@/utils/chess";
 import { positionFromFen } from "@/utils/chessops";
 import type { Completion, Puzzle } from "@/utils/puzzles";
 import { getNodeAtPath, treeIteratorMainLine } from "@/utils/treeReducer";
 import PromotionModal from "../boards/PromotionModal";
+import { getEngineArrowShapes } from "../boards/engineArrowShapes";
 import { TreeStateContext } from "../common/TreeStateContext";
 
 function PuzzleBoard({
@@ -38,6 +48,10 @@ function PuzzleBoard({
   const position = useStore(store, (s) => s.position);
   const moveHighlight = useAtomValue(moveHighlightAtom);
   const boardShapes = useStore(store, (s) => s.currentNode().shapes);
+  const moves = useStore(
+    store,
+    useShallow((s) => getVariationLine(s.root, s.position)),
+  );
   const makeMove = useStore(store, (s) => s.makeMove);
   const makeMoves = useStore(store, (s) => s.makeMoves);
   const reset = useForceUpdate();
@@ -75,6 +89,17 @@ function PuzzleBoard({
   const dests = pos ? chessgroundDests(pos) : new Map();
   const turn = pos?.turn || "white";
   const showCoordinates = useAtomValue(showCoordinatesAtom);
+  const showArrows = useAtomValue(showArrowsAtom);
+  const showConsecutiveArrows = useAtomValue(showConsecutiveArrowsAtom);
+  const engineArrows = useAtomValue(bestMovesFamily({ fen: root.fen, gameMoves: moves }));
+  const autoShapes =
+    reviewMode && showArrows && pos && engineArrows.size > 0
+      ? getEngineArrowShapes({
+          arrows: engineArrows,
+          pos,
+          showConsecutiveArrows,
+        }).concat(boardShapes)
+      : boardShapes;
 
   async function checkMove(move: Move) {
     if (!pos) return;
@@ -162,7 +187,7 @@ function PuzzleBoard({
           drawable={{
             enabled: true,
             visible: true,
-            autoShapes: boardShapes,
+            autoShapes,
           }}
           movable={{
             free: false,
