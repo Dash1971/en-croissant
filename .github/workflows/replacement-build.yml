@@ -2,6 +2,9 @@ name: En Croissant Replacement Build
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - build/puzzle-analysis-replacement
 
 permissions:
   contents: read
