@@ -44,6 +44,7 @@ jobs:
 
       - name: Run frontend checks
         run: |
+          pnpm format
           pnpm lint:ci
           pnpm test
           pnpm build-vite
