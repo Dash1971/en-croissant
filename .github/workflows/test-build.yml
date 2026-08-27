@@ -84,7 +84,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build installer
-        run: pnpm tauri build ${{ matrix.args }}
+        run: pnpm tauri build ${{ matrix.args }} --config src-tauri/tauri.test-build.conf.json
         env:
           CI: false
 
