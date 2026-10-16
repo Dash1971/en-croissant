@@ -3,6 +3,7 @@ import { makeSquare, type NormalMove, parseUci } from "chessops";
 import type { Position } from "chessops/chess";
 import { match } from "ts-pattern";
 import { arrowColors } from "../panels/analysis/BestMoves";
+import { agreementArrowShape, getEngineAgreements } from "./engineAgreementArrows";
 
 const LARGE_BRUSH = 11;
 const MEDIUM_BRUSH = 7.5;
@@ -12,10 +13,14 @@ export function getEngineArrowShapes({
     arrows,
     pos,
     showConsecutiveArrows,
+    orientation,
+    boardId,
 }: {
     arrows: Map<number, { pv: string[]; winChance: number }[]>;
     pos: Position;
     showConsecutiveArrows: boolean;
+    orientation: "white" | "black";
+    boardId: string;
 }): DrawShape[] {
     const shapes: DrawShape[] = [];
     const entries = Array.from(arrows.entries()).sort((a, b) => a[0] - b[0]);
@@ -67,6 +72,21 @@ export function getEngineArrowShapes({
                     break;
                 }
             }
+        }
+    }
+
+    for (const agreement of getEngineAgreements(arrows)) {
+        const index = shapes.findIndex(
+            (shape) => shape.orig === agreement.orig && shape.dest === agreement.dest,
+        );
+        if (index !== -1) {
+            shapes[index] = agreementArrowShape(
+                agreement.orig,
+                agreement.dest,
+                agreement.colors,
+                orientation,
+                boardId,
+            );
         }
     }
 

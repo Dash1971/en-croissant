@@ -5,7 +5,7 @@ import { chessgroundDests, chessgroundMove } from "chessops/compat";
 import { parseFen } from "chessops/fen";
 import equal from "fast-deep-equal";
 import { useAtom, useAtomValue } from "jotai";
-import { useContext, useState } from "react";
+import { useContext, useId, useState } from "react";
 import { useStore } from "zustand";
 import { useShallow } from "zustand/react/shallow";
 import { Chessground } from "@/chessground/Chessground";
@@ -96,12 +96,15 @@ function PuzzleBoard({
   const showArrows = useAtomValue(showArrowsAtom);
   const showConsecutiveArrows = useAtomValue(showConsecutiveArrowsAtom);
   const engineArrows = useAtomValue(bestMovesFamily({ fen: root.fen, gameMoves: moves }));
+  const agreementBoardId = useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const autoShapes =
     reviewMode && showArrows && pos && engineArrows.size > 0
       ? getEngineArrowShapes({
           arrows: engineArrows,
           pos,
           showConsecutiveArrows,
+          orientation,
+          boardId: agreementBoardId,
         }).concat(boardShapes)
       : boardShapes;
 

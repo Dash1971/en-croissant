@@ -8,14 +8,13 @@ import {
   type NormalMove,
   type Piece,
   parseSquare,
-  parseUci,
   type SquareName,
 } from "chessops";
 import { chessgroundDests, chessgroundMove } from "chessops/compat";
 import { makeFen, parseFen } from "chessops/fen";
 import { makeSan } from "chessops/san";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { memo, useCallback, useContext, useMemo, useState } from "react";
+import { memo, useCallback, useContext, useId, useMemo, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useTranslation } from "react-i18next";
 import { match } from "ts-pattern";
@@ -117,6 +116,7 @@ function Board({
       gameMoves: moves,
     }),
   );
+  const agreementBoardId = useId().replace(/[^a-zA-Z0-9_-]/g, "");
 
   const goToNext = useStore(store, (s) => s.goToNext);
   const goToPrevious = useStore(store, (s) => s.goToPrevious);
@@ -239,7 +239,13 @@ function Board({
 
   let shapes: DrawShape[] = [];
   if (showArrows && evalOpen && arrows.size > 0 && pos) {
-    shapes = getEngineArrowShapes({ arrows, pos, showConsecutiveArrows });
+    shapes = getEngineArrowShapes({
+      arrows,
+      pos,
+      showConsecutiveArrows,
+      orientation,
+      boardId: agreementBoardId,
+    });
   }
 
   // Variation arrows: show all children moves when there are alternatives
