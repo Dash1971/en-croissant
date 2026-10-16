@@ -11,6 +11,7 @@ import { useShallow } from "zustand/react/shallow";
 import { Chessground } from "@/chessground/Chessground";
 import {
   bestMovesFamily,
+  eraseDrawablesOnClickAtom,
   jumpToNextPuzzleAtom,
   moveHighlightAtom,
   showArrowsAtom,
@@ -52,6 +53,9 @@ function PuzzleBoard({
     store,
     useShallow((s) => getVariationLine(s.root, s.position)),
   );
+  const setShapes = useStore(store, (s) => s.setShapes);
+  const clearShapes = useStore(store, (s) => s.clearShapes);
+  const eraseDrawablesOnClick = useAtomValue(eraseDrawablesOnClickAtom);
   const makeMove = useStore(store, (s) => s.makeMove);
   const makeMoves = useStore(store, (s) => s.makeMoves);
   const reset = useForceUpdate();
@@ -161,6 +165,9 @@ function PuzzleBoard({
     <Box w="100%" h="100%" ref={parentRef}>
       <Box
         className={classes.chessboard}
+        onClick={() => {
+          eraseDrawablesOnClick && clearShapes();
+        }}
         style={{
           maxWidth: parentHeight,
         }}
@@ -188,6 +195,9 @@ function PuzzleBoard({
             enabled: true,
             visible: true,
             autoShapes,
+            onChange: (shapes) => {
+              setShapes(shapes);
+            },
           }}
           movable={{
             free: false,
