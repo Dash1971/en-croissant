@@ -98,6 +98,7 @@ export function getEngineArrowShapes({
                 boardId,
                 {
                     lineWidth: shapes[index].modifiers?.lineWidth ?? LARGE_BRUSH,
+                    opacities: agreement.opacities,
                     shorten: shortenAgreementArrow(agreement.dest, [
                         ...shapes,
                         ...additionalShapes,
