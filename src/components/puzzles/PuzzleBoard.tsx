@@ -105,6 +105,7 @@ function PuzzleBoard({
           showConsecutiveArrows,
           orientation,
           boardId: agreementBoardId,
+          additionalShapes: boardShapes,
         }).concat(boardShapes)
       : boardShapes;
 

@@ -3,7 +3,11 @@ import { makeSquare, type NormalMove, parseUci } from "chessops";
 import type { Position } from "chessops/chess";
 import { match } from "ts-pattern";
 import { arrowColors } from "../panels/analysis/BestMoves";
-import { agreementArrowShape, getEngineAgreements } from "./engineAgreementArrows";
+import {
+    agreementArrowShape,
+    getEngineAgreements,
+    shortenAgreementArrow,
+} from "./engineAgreementArrows";
 
 const LARGE_BRUSH = 11;
 const MEDIUM_BRUSH = 7.5;
@@ -15,12 +19,16 @@ export function getEngineArrowShapes({
     showConsecutiveArrows,
     orientation,
     boardId,
+    deferAgreements = false,
+    additionalShapes = [],
 }: {
     arrows: Map<number, { pv: string[]; winChance: number }[]>;
     pos: Position;
     showConsecutiveArrows: boolean;
     orientation: "white" | "black";
     boardId: string;
+    deferAgreements?: boolean;
+    additionalShapes?: DrawShape[];
 }): DrawShape[] {
     const shapes: DrawShape[] = [];
     const entries = Array.from(arrows.entries()).sort((a, b) => a[0] - b[0]);
@@ -75,6 +83,8 @@ export function getEngineArrowShapes({
         }
     }
 
+    if (deferAgreements) return shapes;
+
     for (const agreement of getEngineAgreements(arrows)) {
         const index = shapes.findIndex(
             (shape) => shape.orig === agreement.orig && shape.dest === agreement.dest,
@@ -86,6 +96,13 @@ export function getEngineArrowShapes({
                 agreement.colors,
                 orientation,
                 boardId,
+                {
+                    lineWidth: shapes[index].modifiers?.lineWidth ?? LARGE_BRUSH,
+                    shorten: shortenAgreementArrow(agreement.dest, [
+                        ...shapes,
+                        ...additionalShapes,
+                    ]),
+                },
             );
         }
     }

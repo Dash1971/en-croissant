@@ -58,11 +58,17 @@ import { updateCardPerformance } from "../files/opening";
 import AnnotationHint from "./AnnotationHint";
 import { BoardBar } from "./BoardBar";
 import Clock from "./Clock";
+import {
+  agreementArrowShape,
+  getEngineAgreements,
+  shortenAgreementArrow,
+} from "./engineAgreementArrows";
 import EvalBar from "./EvalBar";
 import { getEngineArrowShapes } from "./engineArrowShapes";
 import MoveInput from "./MoveInput";
 import PromotionModal from "./PromotionModal";
 
+const LARGE_BRUSH = 11;
 const MEDIUM_BRUSH = 7.5;
 const BAR_HEIGHT = "1.9rem";
 
@@ -245,8 +251,11 @@ function Board({
       showConsecutiveArrows,
       orientation,
       boardId: agreementBoardId,
+      deferAgreements: true,
     });
   }
+
+  const engineShapeCount = shapes.length;
 
   // Variation arrows: show all children moves when there are alternatives
   if (showVariationArrows && !practicing && currentNode.children.length > 1) {
@@ -271,6 +280,27 @@ function Board({
 
   if (currentNode.shapes.length > 0) {
     shapes = shapes.concat(currentNode.shapes);
+  }
+
+  if (showArrows && evalOpen && arrows.size > 0 && pos) {
+    for (const agreement of getEngineAgreements(arrows)) {
+      const index = shapes.findIndex(
+        (shape) => shape.orig === agreement.orig && shape.dest === agreement.dest,
+      );
+      if (index !== -1 && index < engineShapeCount) {
+        shapes[index] = agreementArrowShape(
+          agreement.orig,
+          agreement.dest,
+          agreement.colors,
+          orientation,
+          agreementBoardId,
+          {
+            lineWidth: shapes[index].modifiers?.lineWidth ?? LARGE_BRUSH,
+            shorten: shortenAgreementArrow(agreement.dest, shapes),
+          },
+        );
+      }
+    }
   }
 
   const hasClock =
