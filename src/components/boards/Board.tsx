@@ -297,6 +297,7 @@ function Board({
           {
             lineWidth: shapes[index].modifiers?.lineWidth ?? LARGE_BRUSH,
             shorten: shortenAgreementArrow(agreement.dest, shapes),
+            opacities: agreement.opacities,
           },
         );
       }
