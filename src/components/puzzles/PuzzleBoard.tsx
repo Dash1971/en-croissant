@@ -11,12 +11,14 @@ import { useShallow } from "zustand/react/shallow";
 import { Chessground } from "@/chessground/Chessground";
 import {
   bestMovesFamily,
+  currentThreatAtom,
   eraseDrawablesOnClickAtom,
   jumpToNextPuzzleAtom,
   moveHighlightAtom,
   showArrowsAtom,
   showConsecutiveArrowsAtom,
   showCoordinatesAtom,
+  showDestsAtom,
 } from "@/state/atoms";
 import classes from "@/styles/Chessboard.module.css";
 import { getVariationLine } from "@/utils/chess";
@@ -48,6 +50,7 @@ function PuzzleBoard({
   const root = useStore(store, (s) => s.root);
   const position = useStore(store, (s) => s.position);
   const moveHighlight = useAtomValue(moveHighlightAtom);
+  const showDests = useAtomValue(showDestsAtom);
   const boardShapes = useStore(store, (s) => s.currentNode().shapes);
   const moves = useStore(
     store,
@@ -95,6 +98,7 @@ function PuzzleBoard({
   const showCoordinates = useAtomValue(showCoordinatesAtom);
   const showArrows = useAtomValue(showArrowsAtom);
   const showConsecutiveArrows = useAtomValue(showConsecutiveArrowsAtom);
+  const threat = useAtomValue(currentThreatAtom);
   const engineArrows = useAtomValue(bestMovesFamily({ fen: root.fen, gameMoves: moves }));
   const agreementBoardId = useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const autoShapes =
@@ -103,6 +107,7 @@ function PuzzleBoard({
           arrows: engineArrows,
           pos,
           showConsecutiveArrows,
+          threat,
           orientation,
           boardId: agreementBoardId,
           additionalShapes: boardShapes,
@@ -212,7 +217,8 @@ function PuzzleBoard({
                 (puzzle.completion === "incomplete" || puzzle.completion === "incorrect"))
                 ? turn
                 : undefined,
-            dests: dests,
+            dests,
+            showDests,
             events: {
               after: (orig, dest) => {
                 const from = parseSquare(orig)!;

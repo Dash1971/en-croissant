@@ -7,6 +7,7 @@ import {
   MantineProvider,
   Textarea,
   TextInput,
+  v8CssVariablesResolver,
 } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
@@ -28,7 +29,6 @@ import {
   is3dAtom,
   pieceSetAtom,
   primaryColorAtom,
-  referenceDbAtom,
   spellCheckAtom,
   storedDatabasesDirAtom,
   storedDocumentDirAtom,
@@ -136,16 +136,6 @@ const checkForUpdates = async () => {
   }
 };
 
-const preloadReferenceDb = async (store: ReturnType<typeof getDefaultStore>) => {
-  const referenceDb = store.get(referenceDbAtom);
-  if (referenceDb) {
-    info(`Preloading reference database: ${referenceDb}`);
-    commands.preloadReferenceDb(referenceDb).catch((e: unknown) => {
-      info(`Failed to preload reference database: ${e}`);
-    });
-  }
-};
-
 const navigateToBoard = () => router.navigate({ to: "/" });
 
 function useAppStartup() {
@@ -196,8 +186,6 @@ function useAppStartup() {
       } catch (e) {
         warn(`Failed to parse CLI args: ${e}`);
       }
-
-      await preloadReferenceDb(store);
 
       let unlistenDeepLink: (() => void) | undefined;
       try {
@@ -271,6 +259,7 @@ export default function App() {
   }, [setDatabaseConversionState]);
 
   const theme = createTheme({
+    defaultRadius: "sm",
     primaryColor,
     colors: {
       dark: [
@@ -334,12 +323,13 @@ export default function App() {
       />
 
       <MantineProvider
+        cssVariablesResolver={v8CssVariablesResolver}
         colorSchemeManager={colorSchemeManager}
         defaultColorScheme="dark"
         theme={theme}
       >
         <ContextMenuProvider>
-          <Notifications />
+          <Notifications pauseResetOnHover="notification" />
           <RouterProvider router={router} />
         </ContextMenuProvider>
       </MantineProvider>
