@@ -80,9 +80,7 @@
       "id": "legacy-puzzle-preservation",
       "rationale": "Unsupported legacy SQLite puzzle files must be preserved during discovery, rather than deleted.",
       "upstream_pr": "https://github.com/franciscoBSalgueiro/en-croissant/pull/1106",
-      "paths": [
-        "src-tauri/src/puzzle.rs"
-      ],
+      "paths": ["src-tauri/src/puzzle.rs"],
       "validation": [
         "Legacy fixture remains byte-identical and absent from the supported list; supported puzzle discovery remains usable."
       ],
