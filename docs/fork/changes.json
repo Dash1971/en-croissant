@@ -9,7 +9,7 @@
     "repository": "https://github.com/Dash1971/en-croissant.git",
     "branch": "main",
     "baseline_commit": "86c9edcca5144688479a8fc9d9f12175f9a49d03",
-    "activation": "review-pending"
+    "activation": "active"
   },
   "maintenance_paths": [
     "README.md",

@@ -36,11 +36,11 @@ The following additions and fixes are included in our [November 21, 2026 custom 
 | Legacy puzzle database preservation     | Keeps unsupported legacy SQLite puzzle files during discovery instead of deleting them. This preserves the files; it does not convert them into the current format.                                                                                                                                                  | [PR #1106](https://github.com/franciscoBSalgueiro/en-croissant/pull/1106) |
 | Duplicate Maia startup fix              | Prevents duplicate pending engine starts, cancels starts for closed boards, and cleans up owned worker processes. Analysis boards can still run in the background until stopped or closed.                                                                                                                           | [PR #1122](https://github.com/franciscoBSalgueiro/en-croissant/pull/1122) |
 
-### Maintenance work under review
+### Fork maintenance
 
-The [bounded maintenance pass](https://github.com/Dash1971/en-croissant/issues/1) proposes a documented fork baseline, manual-only fork updates, and unpublished Mac candidates with source/build receipts and upstream drift reports. These are review changes, not an announced release or an update to the installed app. Native engine and copied-database testing remain separate release gates.
+The [bounded maintenance pass](https://github.com/Dash1971/en-croissant/issues/1) was approved and merged on November 23, 2026. `main` is the maintained default branch; `master` stays an upstream mirror. The repository includes a documented fork baseline, manual-only fork updates, and unpublished Mac candidates with source/build receipts and read-only upstream drift reports. Merging these changes does not update an installed app or publish a downloadable release. Real-engine and copied-database testing remain separate release gates for future builds.
 
-See the [maintenance contract](docs/fork/maintenance.md) and [change register](docs/fork/changes.json) for scope, validation and the conditions for retiring each fork change. The generic build instructions below describe upstream; maintained candidate builds must follow the reviewed fork distribution and build instructions when available.
+See the [maintenance contract](docs/fork/maintenance.md) and [change register](docs/fork/changes.json) for scope, validation and the conditions for retiring each fork change. The generic build instructions below describe upstream; maintained candidate builds must follow the [fork distribution contract](docs/fork/updates.md) and [candidate build instructions](docs/fork/releasing.md).
 
 ## Features
 
