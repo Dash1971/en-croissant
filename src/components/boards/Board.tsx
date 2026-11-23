@@ -9,14 +9,13 @@ import {
   type NormalMove,
   type Piece,
   parseSquare,
-  parseUci,
   type SquareName,
 } from "chessops";
 import { chessgroundDests, chessgroundMove } from "chessops/compat";
 import { makeFen, parseFen } from "chessops/fen";
 import { makeSan } from "chessops/san";
 import { useAtom, useAtomValue } from "jotai";
-import { memo, useCallback, useContext, useMemo, useState } from "react";
+import { memo, useCallback, useContext, useId, useMemo, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useTranslation } from "react-i18next";
 import { match } from "ts-pattern";
@@ -29,6 +28,7 @@ import {
   currentEvalOpenAtom,
   currentShowCommentsAtom,
   currentTabAtom,
+  currentThreatAtom,
   deckAtomFamily,
   enableBoardScrollAtom,
   eraseDrawablesOnClickAtom,
@@ -57,17 +57,21 @@ import ShowMaterial from "../common/ShowMaterial";
 import { TreeStateContext } from "../common/TreeStateContext";
 import FideInfo from "../databases/FideInfo";
 import { updateCardPerformance } from "../files/opening";
-import { arrowColors } from "../panels/analysis/BestMoves";
 import AnnotationHint from "./AnnotationHint";
 import { BoardBar } from "./BoardBar";
 import Clock from "./Clock";
+import {
+  agreementArrowShape,
+  getEngineAgreements,
+  shortenAgreementArrow,
+} from "./engineAgreementArrows";
 import EvalBar from "./EvalBar";
+import { getEngineArrowShapes } from "./engineArrowShapes";
 import MoveInput from "./MoveInput";
 import PromotionModal from "./PromotionModal";
 
 const LARGE_BRUSH = 11;
 const MEDIUM_BRUSH = 7.5;
-const SMALL_BRUSH = 4;
 const BAR_HEIGHT = "1.9rem";
 
 interface ChessboardProps {
@@ -120,6 +124,7 @@ function Board({
       gameMoves: moves,
     }),
   );
+  const agreementBoardId = useId().replace(/[^a-zA-Z0-9_-]/g, "");
 
   const goToNext = useStore(store, (s) => s.goToNext);
   const goToPrevious = useStore(store, (s) => s.goToPrevious);
@@ -139,6 +144,7 @@ function Board({
   const showArrows = useAtomValue(showArrowsAtom);
   const showVariationArrows = useAtomValue(showVariationArrowsAtom);
   const showConsecutiveArrows = useAtomValue(showConsecutiveArrowsAtom);
+  const threat = useAtomValue(currentThreatAtom);
   const eraseDrawablesOnClick = useAtomValue(eraseDrawablesOnClickAtom);
   const autoPromote = useAtomValue(autoPromoteAtom);
   const forcedEP = useAtomValue(forcedEnPassantAtom);
@@ -242,57 +248,18 @@ function Board({
 
   let shapes: DrawShape[] = [];
   if (showArrows && evalOpen && arrows.size > 0 && pos) {
-    const entries = Array.from(arrows.entries()).sort((a, b) => a[0] - b[0]);
-    for (const [i, moves] of entries) {
-      if (i < 4) {
-        const bestWinChance = moves[0].winChance;
-        for (const [j, { pv, winChance }] of moves.entries()) {
-          const posClone = pos.clone();
-          let prevSquare = null;
-          for (const [ii, uci] of pv.entries()) {
-            const m = parseUci(uci)! as NormalMove;
-
-            posClone.play(m);
-            const from = makeSquare(m.from)!;
-            const to = makeSquare(m.to)!;
-            if (prevSquare === null) {
-              prevSquare = from;
-            }
-            const brushSize = match(bestWinChance - winChance)
-              .when(
-                (d) => d < 2.5,
-                () => LARGE_BRUSH,
-              )
-              .when(
-                (d) => d < 5,
-                () => MEDIUM_BRUSH,
-              )
-              .otherwise(() => SMALL_BRUSH);
-
-            if (ii === 0 || (showConsecutiveArrows && j === 0 && ii % 2 === 0)) {
-              if (
-                ii < 5 && // max 3 arrows
-                !shapes.find((s) => s.orig === from && s.dest === to) &&
-                prevSquare === from
-              ) {
-                shapes.push({
-                  orig: from,
-                  dest: to,
-                  brush: j === 0 ? arrowColors[i].strong : arrowColors[i].pale,
-                  modifiers: {
-                    lineWidth: brushSize,
-                  },
-                });
-                prevSquare = to;
-              } else {
-                break;
-              }
-            }
-          }
-        }
-      }
-    }
+    shapes = getEngineArrowShapes({
+      arrows,
+      pos,
+      showConsecutiveArrows,
+      threat,
+      orientation,
+      boardId: agreementBoardId,
+      deferAgreements: true,
+    });
   }
+
+  const engineShapeCount = shapes.length;
 
   // Variation arrows: show all children moves when there are alternatives
   if (showVariationArrows && !practicing && currentNode.children.length > 1) {
@@ -318,6 +285,28 @@ function Board({
   const awaitingMove = practicing && practiceState.phase === "waiting";
   if (!awaitingMove && currentNode.shapes.length > 0) {
     shapes = shapes.concat(currentNode.shapes);
+  }
+
+  if (showArrows && evalOpen && arrows.size > 0 && pos) {
+    for (const agreement of getEngineAgreements(arrows)) {
+      const index = shapes.findIndex(
+        (shape) => shape.orig === agreement.orig && shape.dest === agreement.dest,
+      );
+      if (index !== -1 && index < engineShapeCount) {
+        shapes[index] = agreementArrowShape(
+          agreement.orig,
+          agreement.dest,
+          agreement.colors,
+          orientation,
+          agreementBoardId,
+          {
+            lineWidth: shapes[index].modifiers?.lineWidth ?? LARGE_BRUSH,
+            shorten: shortenAgreementArrow(agreement.dest, shapes),
+            opacities: agreement.opacities,
+          },
+        );
+      }
+    }
   }
 
   const hasClock =

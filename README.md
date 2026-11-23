@@ -22,6 +22,26 @@
 
 En-Croissant is an open-source, cross-platform chess GUI that aims to be powerful, customizable and easy to use.
 
+## About this fork
+
+This is a Maia-oriented fork of [En Croissant](https://github.com/franciscoBSalgueiro/en-croissant), maintained by [Dash1971](https://github.com/Dash1971/en-croissant). It keeps upstream's chess toolkit and adds support for comparing Stockfish and Maia analysis, reviewing puzzles, and preserving data. Upstream retains its existing credits and GPL-3.0 license.
+
+The following additions and fixes are included in our [November 21, 2026 custom Mac build](docs/fork/releases/2026-11-21.json). The linked upstream PRs describe the contributions; inclusion in this fork does not imply upstream acceptance.
+
+| Addition or fix                         | Behavior                                                                                                                                                                                                                                                                                                             | Upstream contribution                                                     |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Multicolor engine agreement arrows      | Shows agreement on displayed candidates, including Stockfish's second and third choices, with two, three, or four agreeing colors. For Stockfish/Maia agreement, the shaft keeps Stockfish's color and the head uses the agreeing Maia colors. Candidate transparency and score-based arrow thickness are preserved. | [PR #946](https://github.com/franciscoBSalgueiro/en-croissant/pull/946)   |
+| Engine analysis after puzzles           | Reviews a completed puzzle on the same board, remembers individual engine selections, and returns to training without showing engine help while solving.                                                                                                                                                             | [PR #888](https://github.com/franciscoBSalgueiro/en-croissant/pull/888)   |
+| Game metadata and autosave preservation | Preserves ECO codes, extra PGN tags and partial dates through database conversion and editing; serializes autosaves so newer edits are retained.                                                                                                                                                                     | [PR #1103](https://github.com/franciscoBSalgueiro/en-croissant/pull/1103) |
+| Legacy puzzle database preservation     | Keeps unsupported legacy SQLite puzzle files during discovery instead of deleting them. This preserves the files; it does not convert them into the current format.                                                                                                                                                  | [PR #1106](https://github.com/franciscoBSalgueiro/en-croissant/pull/1106) |
+| Duplicate Maia startup fix              | Prevents duplicate pending engine starts, cancels starts for closed boards, and cleans up owned worker processes. Analysis boards can still run in the background until stopped or closed.                                                                                                                           | [PR #1122](https://github.com/franciscoBSalgueiro/en-croissant/pull/1122) |
+
+### Maintenance work under review
+
+The [bounded maintenance pass](https://github.com/Dash1971/en-croissant/issues/1) proposes a documented fork baseline, manual-only fork updates, and unpublished Mac candidates with source/build receipts and upstream drift reports. These are review changes, not an announced release or an update to the installed app. Native engine and copied-database testing remain separate release gates.
+
+See the [maintenance contract](docs/fork/maintenance.md) and [change register](docs/fork/changes.json) for scope, validation and the conditions for retiring each fork change. The generic build instructions below describe upstream; maintained candidate builds must follow the reviewed fork distribution and build instructions when available.
+
 ## Features
 
 - Store and analyze your games from [lichess.org](https://lichess.org) and [chess.com](https://chess.com)

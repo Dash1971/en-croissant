@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "historical-installed-build",
+  "date": "2026-11-21",
+  "upstream_commit": "c8473936129bb6f1a919882e45527daa4d3a1e34",
+  "fork_commit": "86c9edcca5144688479a8fc9d9f12175f9a49d03",
+  "application_version": "0.16.1",
+  "architecture": "arm64",
+  "executable_sha256": "df75c113d469d7dce086ce6bb03770730bc93789dac461263dbf0677b2024bac",
+  "archive_sha256": "692f391264ea1a990f18c91f3e78a4aac0c6cb668a1f6afc664c650ec719e87c",
+  "archive_published": false,
+  "signing": "ad-hoc",
+  "notarized": false,
+  "tests": {
+    "rust_passed": 61,
+    "frontend_passed": 145,
+    "native_integration": "passed in isolated profile with three database copies and real Stockfish 18 plus two Maia3 engines",
+    "originals_and_copies_hashes_unchanged": true
+  },
+  "limitations": [
+    "Historical local validation, not a CI receipt for later commits.",
+    "Kernel-panic causation remains unconfirmed.",
+    "No private data or model files are included in this record."
+  ]
+}
