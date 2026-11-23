@@ -14,14 +14,25 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Check maintained fork evidence tooling
+        if: github.repository == 'Dash1971/en-croissant'
+        run: |
+          python3 -m unittest discover -s scripts/fork -p 'test_*.py'
+          python3 scripts/fork/manage.py register-check
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: "12.15.0"
 
       - name: Sync node version and setup cache
         uses: actions/setup-node@v3
         with:
-          node-version: "24"
+          node-version: "24.22.3"
           cache: "pnpm"
 
       - name: Install app dependencies
