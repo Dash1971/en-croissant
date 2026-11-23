@@ -305,7 +305,9 @@ fn main() {
             #[cfg(desktop)]
             app.handle().plugin(tauri_plugin_cli::init())?;
 
-            #[cfg(desktop)]
+            // Maintained fork releases are installed manually; never register
+            // the official updater, even if a frontend invokes it accidentally.
+            #[cfg(all(desktop, not(feature = "maintained-fork")))]
             app.handle()
                 .plugin(tauri_plugin_updater::Builder::new().build())?;
 

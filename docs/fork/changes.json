@@ -103,6 +103,24 @@
         "Ten Unix lifecycle regressions, including delayed readiness and owned worker cleanup; real two-Maia cold-start/navigation and close/quit sampling."
       ],
       "retire_when": "Upstream prevents duplicate pending startup, late resurrection and worker leaks with equivalent per-ID/per-tab and native lifecycle coverage."
+    },
+    {
+      "id": "maintained-distribution-updates",
+      "rationale": "Opt-in maintained builds must never replace fork-only behavior through the official updater; startup is silent and manual checks open the fork release page.",
+      "upstream_pr": null,
+      "paths": [
+        "src/App.tsx",
+        "src/routes/__root.tsx",
+        "src/utils/updates.ts",
+        "src/utils/updates.test.ts",
+        "src-tauri/Cargo.toml",
+        "src-tauri/src/main.rs",
+        "src-tauri/tauri.maintained.conf.json"
+      ],
+      "validation": [
+        "Startup and manual updater regressions in both distributions; merged overlay validation; paired Cargo feature, frontend environment and overlay checks before sharing a candidate."
+      ],
+      "retire_when": "Only after an explicit return to upstream or a reviewed trusted fork-specific update channel; retain all guards while shipping fork-only changes."
     }
   ]
 }
