@@ -1,18 +1,18 @@
-# Maintained fork: review contract
+# Maintained fork: maintenance contract
 
-This is the proposed maintenance contract for the Maia-oriented En Croissant
+This is the maintenance contract for the Maia-oriented En Croissant
 distribution in `Dash1971/en-croissant`. The existing application and upstream
 credits are retained. Product renaming and new features are separate decisions.
 
 ## Source of truth
 
 - `master` is an untouched, fast-forward-only mirror of upstream `master`.
-- `main` is the proposed maintained application branch. It initially points to
-  unchanged upstream as a review anchor. The baseline PR collects the complete
-  previously installed application; it does not install an app.
-- The default branch remains `master` during review. Changing it to `main`,
-  configuring branch protections, merging this stack and publishing a release
-  are later owner-approved steps, not side effects of opening the PRs.
+- `main` is the maintained application branch and repository default. It includes
+  the complete previously installed application and the approved maintenance
+  changes. The initial upstream review anchor was replaced through merge PRs.
+- The owner approved merging the maintenance stack and publishing the repository
+  changes on November 23, 2026. This does not install an app or publish a binary
+  release. Branch protection changes and future releases remain separate work.
 - Preserve published history. Merge selected upstream revisions through reviewed
   PRs; never rebase or force-push released maintained history. Unmerged review
   branches may be updated normally. Urgent upstream fixes use `cherry-pick -x`.
@@ -51,9 +51,9 @@ Only update the register's upstream base after resolving and reviewing the merge
 
 ## Candidate and release gates
 
-The release workflow and updater policy are separate stacked review PRs. Until
-they are approved, this document is a contract, not evidence that automation or
-a custom update feed is active.
+The updater policy and candidate tooling were merged in separate PRs. Maintained
+builds use manual updates; candidate artifacts are unpublished. There is no
+automatic fork update feed or binary release from this maintenance pass.
 
 A candidate must identify the exact fork commit/tree and upstream base, lockfile
 hashes, tool versions, architecture, test receipts, signing status and output
@@ -77,7 +77,7 @@ Before a future release or installation:
 
 ## Distribution and data policy
 
-The proposed fork channel uses manual installation from reviewed fork releases.
+The fork channel uses manual installation from reviewed fork releases.
 An official updater must not replace a fork candidate. A signed automatic fork
 feed, signing/notarization credentials and release publishing are later work.
 The fork-update PR must guard both startup and manual checks and retain official
@@ -88,13 +88,17 @@ database formats or installed app. Future distribution-identity changes need an
 explicit migration plan. Runtime preferences, iCloud paths, private data and
 model weights stay outside source/release evidence.
 
-## Review order
+## Maintenance adoption
 
 1. Existing application baseline, register and this contract.
 2. Custom distribution/manual update policy, based on the baseline branch.
 3. Native CI, candidate build receipts and read-only drift checks, based on the
    distribution branch.
 
-All three PRs remain unmerged until reviewed and approved. After each approved
-merge, retarget the next PR and verify its exact head/checks. No tag, release,
-installed build or default-branch switch is authorized by this review stack.
+These three PRs were merged in that order after owner approval:
+[baseline #2](https://github.com/Dash1971/en-croissant/pull/2),
+[manual updates #3](https://github.com/Dash1971/en-croissant/pull/3), and
+[candidate evidence #4](https://github.com/Dash1971/en-croissant/pull/4).
+The tracking record is [issue #1](https://github.com/Dash1971/en-croissant/issues/1).
+No tag, binary release or installed build was changed. Future changes continue
+through reviewed PRs; merge approval does not imply release or installation approval.

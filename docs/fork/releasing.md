@@ -1,6 +1,6 @@
 # Candidate evidence and release gates
 
-This review stack creates unpublished candidates only. It neither publishes a
+The candidate tooling creates unpublished candidates only. It neither publishes a
 GitHub release nor changes the default branch, installs an app, merges source,
 uses signing credentials, or creates an updater feed. The inherited publishing
 workflow is explicitly restricted to the upstream repository. The maintained
@@ -122,9 +122,9 @@ reported as `conflicts`; fetch/revision/comparison failures are recorded as
 list. The workflow retains reports, including error diagnostics, for 30 days.
 
 The weekly schedule is gated on this repository's default branch being `main`.
-It remains inactive during the unmerged review stack and while `master` is the
-default. Enabling it requires the separately approved merge/default-branch change;
-manual dispatch can review drift earlier. No scheduled Codex task is created.
+The owner approved the merge/default-branch change on November 23, 2026, enabling
+the read-only Monday report at 09:17 Japan time. It never merges or pushes changes.
+Manual dispatch can run the same report. No scheduled Codex task is created.
 
 The register checker requires every committed path differing from the recorded
 upstream base to match an existing change area or an explicit maintenance path.
