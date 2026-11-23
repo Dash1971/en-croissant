@@ -1,0 +1,32 @@
+name: Maintained fork upstream drift
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 2 * * 1"
+permissions:
+  contents: read
+jobs:
+  read-only-report:
+    # Scheduled workflows are inactive for this review stack. The owner must
+    # approve merging it and making main the default branch before weekly runs.
+    if: >-
+      github.repository == 'Dash1971/en-croissant' &&
+      (github.event_name == 'workflow_dispatch' || github.event.repository.default_branch == 'main')
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify change register
+        run: python3 scripts/fork/manage.py register-check
+      - name: Compare exact upstream revisions without merging
+        run: python3 scripts/fork/manage.py drift
+      - name: Retain drift evidence, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: upstream-drift-${{ github.sha }}
+          path: scripts/fork/out/drift.json
+          if-no-files-found: error
+          retention-days: 30

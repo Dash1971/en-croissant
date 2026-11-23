@@ -1,0 +1,73 @@
+name: Maintained fork candidate
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "src/**"
+      - "src-tauri/**"
+      - "scripts/**"
+      - "docs/fork/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "vite.config.ts"
+      - ".github/workflows/**"
+permissions:
+  contents: read
+concurrency:
+  group: fork-candidate-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  arm64-candidate:
+    if: github.repository == 'Dash1971/en-croissant'
+    # GitHub's standard macos-15 image is Apple Silicon, not Intel.
+    runs-on: macos-15
+    timeout-minutes: 90
+    env:
+      CARGO_BUILD_JOBS: "2"
+      CARGO_HOME: ${{ github.workspace }}/scripts/fork/out/cache/cargo
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          # PR candidates identify the actual reviewed head, not a synthetic merge.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Read checked-in tool versions
+        id: pins
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          pins = json.load(open("scripts/fork/inputs.json"))
+          for key in ("rust", "node", "pnpm"):
+              print(f"{key}={pins[key]}")
+          PY
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ steps.pins.outputs.node }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ steps.pins.outputs.pnpm }}
+      - name: Install exact native Rust toolchain
+        env:
+          RUST_VERSION: ${{ steps.pins.outputs.rust }}
+        run: rustup toolchain install "$RUST_VERSION" --profile minimal --target aarch64-apple-darwin
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+          key: maintained-${{ hashFiles('scripts/fork/inputs.json') }}
+      - name: Validate and build unpublished candidate
+        env:
+          RUSTUP_TOOLCHAIN: ${{ steps.pins.outputs.rust }}
+        run: python3 scripts/fork/manage.py candidate
+      - name: Retain candidate receipt and diagnostic logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maintained-arm64-candidate-${{ github.event.pull_request.head.sha || github.sha }}
+          retention-days: 14
+          if-no-files-found: error
+          path: |
+            scripts/fork/out/candidate-*/receipt.json
+            scripts/fork/out/candidate-*/failed-step.json
+            scripts/fork/out/candidate-*/logs/*.log
+            scripts/fork/out/candidate-*/*candidate.zip

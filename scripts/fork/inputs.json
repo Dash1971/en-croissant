@@ -1,0 +1,13 @@
+{
+  "rust": "1.99.1",
+  "node": "24.22.3",
+  "pnpm": "12.15.0",
+  "target": "aarch64-apple-darwin",
+  "aix": {
+    "tag": "dev-3951342",
+    "asset": "aixchess-v2.0.0-extension-osx_arm64.duckdb_extension",
+    "url": "https://github.com/franciscoBSalgueiro/aix/releases/download/dev-3951342/aixchess-v2.0.0-extension-osx_arm64.duckdb_extension",
+    "sha256": "5c844b19f51c49e73de3fb4db7eea08fadc46f86ab57e6e071f8bb6b85d91dd7",
+    "size": 12532814
+  }
+}
