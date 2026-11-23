@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "upstream": {
+    "repository": "https://github.com/franciscoBSalgueiro/en-croissant.git",
+    "branch": "master",
+    "commit": "c8473936129bb6f1a919882e45527daa4d3a1e34"
+  },
+  "maintained": {
+    "repository": "https://github.com/Dash1971/en-croissant.git",
+    "branch": "main",
+    "baseline_commit": "86c9edcca5144688479a8fc9d9f12175f9a49d03",
+    "activation": "review-pending"
+  },
+  "maintenance_paths": [
+    "README.md",
+    "CONTRIBUTING.md",
+    "docs/fork/**",
+    ".github/**",
+    "scripts/fork/**",
+    "rust-toolchain.toml",
+    "vite.config.ts"
+  ],
+  "changes": [
+    {
+      "id": "engine-agreement-arrows",
+      "rationale": "Show agreement on all displayed candidates with the first engine shaft and other engine colors in the head; preserve opacity and score-based width.",
+      "upstream_pr": "https://github.com/franciscoBSalgueiro/en-croissant/pull/946",
+      "paths": [
+        "src/components/boards/Board.tsx",
+        "src/components/boards/engineAgreementArrows*",
+        "src/components/boards/engineArrowShapes*",
+        "src/components/panels/analysis/AnalysisPanel.tsx",
+        "src/styles/chessgroundBaseOverride.css"
+      ],
+      "validation": [
+        "Arrow helper and renderer tests; real 2/3/4-color and secondary Stockfish candidate checks."
+      ],
+      "retire_when": "Upstream provides equivalent tested agreement rendering; remove the custom implementation after parity review."
+    },
+    {
+      "id": "post-puzzle-engine-review",
+      "rationale": "Review a completed puzzle on the same board, remember individual engine choices, and return to training without exposing help during solving.",
+      "upstream_pr": "https://github.com/franciscoBSalgueiro/en-croissant/pull/888",
+      "paths": [
+        "src/components/puzzles/PuzzleBoard.tsx",
+        "src/components/puzzles/PuzzleBoard.test.tsx",
+        "src/components/puzzles/Puzzles.tsx",
+        "src/components/panels/analysis/BestMoves.tsx",
+        "src/components/panels/analysis/BestMoves.test.tsx",
+        "src/state/atoms.ts",
+        "src/translation/*.json"
+      ],
+      "validation": [
+        "Puzzle component and engine-toggle regressions; completion, review, stepping back and Continue Training in an isolated profile."
+      ],
+      "retire_when": "Upstream provides equivalent same-board review and remembered selections; remove only after native workflow parity checks."
+    },
+    {
+      "id": "pgn-metadata-and-autosave",
+      "rationale": "Preserve ECO/extra tags and partial dates through conversion/editing, and serialize database autosaves so newer edits are retained.",
+      "upstream_pr": "https://github.com/franciscoBSalgueiro/en-croissant/pull/1103",
+      "paths": [
+        "src-tauri/src/db/annotations.rs",
+        "src-tauri/src/db/collection.rs",
+        "src-tauri/src/db/legacy.rs",
+        "src-tauri/src/db/mod.rs",
+        "src-tauri/src/db/pgn.rs",
+        "src/components/boards/BoardAnalysis.tsx",
+        "src/components/common/GameInfo.tsx",
+        "src/components/common/GameInfo.test.tsx",
+        "src/utils/tabs.ts",
+        "src/utils/tabs.test.ts"
+      ],
+      "validation": [
+        "Metadata and autosave regressions; migration/save/reopen against copies; compare original hashes."
+      ],
+      "retire_when": "Upstream preserves the same metadata and latest-edit guarantees; verify copy-based round trips before retiring."
+    },
+    {
+      "id": "legacy-puzzle-preservation",
+      "rationale": "Unsupported legacy SQLite puzzle files must be preserved during discovery, rather than deleted.",
+      "upstream_pr": "https://github.com/franciscoBSalgueiro/en-croissant/pull/1106",
+      "paths": [
+        "src-tauri/src/puzzle.rs"
+      ],
+      "validation": [
+        "Legacy fixture remains byte-identical and absent from the supported list; supported puzzle discovery remains usable."
+      ],
+      "retire_when": "Upstream discovery preserves unsupported files or supplies a verified non-destructive migration with equivalent tests."
+    },
+    {
+      "id": "analysis-engine-lifecycle",
+      "rationale": "Reserve pending UCI startup per tab/engine, cancel closed-board starts and clean up owned worker processes without changing background analysis.",
+      "upstream_pr": "https://github.com/franciscoBSalgueiro/en-croissant/pull/1122",
+      "paths": [
+        "src-tauri/Cargo.toml",
+        "src-tauri/Cargo.lock",
+        "src-tauri/src/chess.rs",
+        "src-tauri/src/chess_lifecycle_tests.rs",
+        "src-tauri/src/engine/mod.rs",
+        "src-tauri/src/engine/process.rs",
+        "src-tauri/src/main.rs"
+      ],
+      "validation": [
+        "Ten Unix lifecycle regressions, including delayed readiness and owned worker cleanup; real two-Maia cold-start/navigation and close/quit sampling."
+      ],
+      "retire_when": "Upstream prevents duplicate pending startup, late resurrection and worker leaks with equivalent per-ID/per-tab and native lifecycle coverage."
+    }
+  ]
+}

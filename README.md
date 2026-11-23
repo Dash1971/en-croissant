@@ -59,3 +59,8 @@ For contributing to this project please refer to the [Contributing guide](./CONT
 
 This software is licensed under GPL-3.0 License.
 Some bundled chess piece sets are distributed under separate licenses.
+
+
+## Maintained fork review track
+
+The Maia-oriented distribution is being organized as a maintained fork. See the [maintenance contract](docs/fork/maintenance.md), [upstream change register](docs/fork/changes.json), and [historical build receipt](docs/fork/releases/2026-11-21.json). Upstream En Croissant retains its existing credits and license. This review track does not announce a new release.
